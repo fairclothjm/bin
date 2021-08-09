@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+# force delete all branches except master
+
+git branch | \
+  grep -v "master\|main" | \
+  xargs git branch -D
+
