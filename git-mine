@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+
+# list custom git commands
+
+cd ~/bin
+ls -1 git-*
