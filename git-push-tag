@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+
+if [[ -z "$1" ]]; then
+  echo "[ERROR] tag name is required"
+  exit 1
+fi
+
+git push origin :"$1"
+git tag -d "$1"
+git tag "$1"
+git push origin "$1"

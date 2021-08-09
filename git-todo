@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+# list all todos
+for file in $(git grep -l TODO); do
+  git blame "$file" | grep -i TODO
+done
+
