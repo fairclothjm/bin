@@ -4,7 +4,7 @@
 
 set -eou pipefail
 
-git log --all -M -C --name-only --format='format:' "$@" | \
+git log --all -M -C --name-only --format='format:' "$@" -- . ':(exclude)vendor' | \
   sort | \
   grep -v '^$' | \
   uniq -c | \
