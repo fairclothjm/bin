@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+gitbranch=$(git branch 2> /dev/null | \
+    sed -e '/^[^*]/d' -e 's/* \(.*\)/ \1/' | \
+    awk '{$1=$1;print}')
+
+
+echo -n "$gitbranch" | pbcopy

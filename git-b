@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+# switch branches based on index selection
+
+readonly green="$(tput -T $TERM setaf 2)"
+readonly reset="$(tput -T $TERM sgr0)"
+
+branch_list=$(git branch)
+
+i=0
+declare -a branches
+while IFS= read -r line; do
+  printf "%s:\t%s\n" "$i" "$line"
+  branches+=("$line")
+  let i=i+1
+done <<< "$branch_list"
+
+echo
+read -p "${green}Select branch #: ${reset}" index
+
+
+# use xargs to trim whitespace
+selection=$(echo "${branches[index]}" | xargs)
+
+git checkout "$selection"
