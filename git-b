@@ -25,3 +25,6 @@ read -p "${green}Select branch #: ${reset}" index
 selection=$(echo "${branches[index]}" | xargs)
 
 git checkout "$selection"
+
+# show last log
+git log -n 1
