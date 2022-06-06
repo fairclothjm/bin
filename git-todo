@@ -2,8 +2,14 @@
 
 set -eou pipefail
 
+search=${1:-TODO}
+
+if [[ "$search" == "jm" ]]; then
+  search="TODO(JM"
+fi
+
 # list all todos
-for file in $(git grep -l TODO); do
+for file in $(git grep -l "$search"); do
   git blame "$file" | grep -i TODO
 done
 

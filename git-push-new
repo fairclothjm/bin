@@ -2,4 +2,12 @@
 
 set -e
 
-git push -u origin $(git branch --show-current)
+branch=$(git branch --show-current)
+BRANCH_REGEX="^(main|master)"
+
+if [[ "$branch" =~ "$BRANCH_REGEX" ]]; then
+  echo "[ERROR]: current branch is $branch"
+  exit 1
+fi
+
+git push -u origin "$branch"

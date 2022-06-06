@@ -4,7 +4,42 @@ set -eou pipefail
 
 # force delete all branches except current, main, and master
 
-git branch | \
-  grep -v "*\|master\|main" | \
-  xargs git branch -D
+arg=${1:-none}
+
+readonly green="$(tput -T $TERM setaf 2)"
+readonly reset="$(tput -T $TERM sgr0)"
+
+case "$arg" in
+  h|-h|--h|help|-help|--help)
+    echo "git branchd"
+    echo
+    echo -e "\tForce delete all branches except current, main, and master."
+    echo -e "\tOutput will be saved to /tmp/git-branchd.log"
+    exit 0
+    ;;
+  none)
+    ;;
+  *)
+    echo "Unknown arg"
+    exit 1
+    ;;
+esac
+
+read -p "${green}Force delete branches? <y/n>: ${reset}" resp
+
+case "$resp" in
+  y|yes)
+    git branch | \
+      grep -v "*\|master\|main" | \
+      xargs git branch -D \
+      | tee /dev/tty > /tmp/git-branchd.log
+    ;;
+  n|no)
+    exit 0
+    ;;
+  *)
+    echo "Unknown response"
+    exit 1
+    ;;
+esac
 
