@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+PLUGIN_DIR=~/dev/plugins
+PLUGIN_DIR_TEMP=~/dev/_plugins
+subcmd="$1"
+
+__usage="
+Usage: $(basename $0) [COMMAND]
+
+Commands:
+  ls                List plugins
+  clean             Empty plugin dir
+  mv                Move a plugin by name
+  populate          Populate plugin dir
+  rm                Delete all plugins
+"
+
+case "$subcmd" in
+  l|ls)
+    ls -lah $PLUGIN_DIR
+    ;;
+  lt|ls-temp)
+    ls -lah $PLUGIN_DIR_TEMP
+    ;;
+  c|clean)
+    mv $PLUGIN_DIR/* $PLUGIN_DIR_TEMP/
+    ;;
+  p|pop|populate)
+    mv $PLUGIN_DIR_TEMP/* $PLUGIN_DIR/
+    ;;
+  mv)
+    shift ;
+
+    if [ -z $@ ]; then
+        echo "[ERROR]: rm requires arg"
+        exit 1
+    fi
+
+    mv "$PLUGIN_DIR/$@" $PLUGIN_DIR_TEMP/
+    ;;
+  rm)
+    rm $PLUGIN_DIR/*
+    ;;
+  *)
+    echo "$__usage"
+    ;;
+esac
+
