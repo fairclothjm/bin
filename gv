@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+function _current_version() {
+  #echo ${v#go};
+  local current=`go version | { read _ _ v _; echo ${v#go}; }`
+  echo $current
+}
+
+function _change_symlink() {
+  if [ -z "$1" ]; then
+    echo "no version passed in"
+    return
+  fi
+  local version=$version
+  local match=$(ls "$GOPATH/bin" | sort -nr | grep "$version" | head -n 1 | grep "$version")
+  echo $match
+  ln -sf $GOPATH/bin/$match /usr/local/bin/go && go version
+}
+
+function _list_installed() {
+  local results=($(ls $GOPATH/bin | sort | grep "go[0-9].[0-9]*[.0-9]*" | tr -s "\n"))
+  local current=$(_current_version)
+  for v in $results
+  do
+    if [ "${v#go}" = "$current" ]; then
+    echo "${v#go} *"
+else
+    echo "${v#go}"
+fi
+  done
+}
+function _install() {
+  if [ -z "$1" ]; then
+    echo "no version passed in"
+    return
+  fi
+  local version=$1
+  echo "go $version downloading ..."
+  go install golang.org/dl/go$version@latest && go$version download && echo "go $version downloaded"
+}
+
+function _remove() {
+  if [ -z "$1" ]; then
+    echo "no version passed in"
+    return
+  fi
+  local version=$1
+  local vpath=$(go$version env GOROOT)
+  rm "$GOPATH/bin/go$version" && rm -rf $vpath && echo "go $version removed"
+}
+
+function gv() {
+  if [ -z "$GOPATH" ]; then
+    echo 'ERROR: GOPATH is not set! Please add the following line to your .zlogin'
+	  exit 1
+  fi
+
+  local command=$1
+  local version=$2
+  if [[ $command == "use" ]]; then
+    _change_symlink $version
+  elif [[ $command == "list" ]]; then
+    _list_installed
+  elif [[ $command == "install" ]]; then
+    _install $version
+  elif [[ $command == "remove" ]]; then
+    _remove $version
+  elif [[ $command == "current" ]]; then
+    _current_version
+  else
+    		echo "Usage: gv [command]
+Description:
+  gv is my Go Version Manager
+Commands:
+  use        - select a go version to use
+  list       - list installed versions
+  install    - install go version
+  remove     - uninstall go version
+"
+  fi
+}
