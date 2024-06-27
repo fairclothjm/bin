@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+echo "git fetch https://web-url.git their-branch:our-name-for-branch"

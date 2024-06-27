@@ -1,0 +1,36 @@
+#!/usr/bin/python3
+
+import sys
+import subprocess
+
+if len(sys.argv) != 3:
+    print("Expected two arguments: FROM TO")
+    exit(1)
+
+output = subprocess.check_output(
+        r"""git diff %s %s -- go.mod | cat | grep -ve indirect | grep -e '^[-+]\t'""" % tuple(sys.argv[1:]), shell=True
+)
+
+minus = {}
+plus = {}
+
+for l in output.decode("utf8").strip().split("\n"):
+    if l.startswith("-"):
+        name, version = l[1:].strip().split(" ")
+        minus[name] = version
+    elif l.startswith("+"):
+        name, version = l[1:].strip().split(" ")
+        plus[name] = version
+
+keys = sorted(set(minus.keys()) | set(plus.keys()))
+print("IMPROVEMENTS:")
+print("* Updated dependencies:")
+for key in keys:
+    if key in minus and key in plus and minus[key] == plus[key]:
+        pass
+    elif key in minus and key in plus:
+        print(f"   * `{key}` {minus[key]} -> {plus[key]}")
+    elif key in minus:
+        print(f"   * `{key}` {minus[key]} removed")
+    else:
+        print(f"   * `{key}` {plus[key]} added")

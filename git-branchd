@@ -9,13 +9,26 @@ arg=${1:-none}
 readonly green="$(tput -T $TERM setaf 2)"
 readonly reset="$(tput -T $TERM sgr0)"
 
+ignore=""
+declare -a arr
+
 case "$arg" in
   h|-h|--h|help|-help|--help)
     echo "git branchd"
     echo
     echo -e "\tForce delete all branches except current, main, and master."
     echo -e "\tOutput will be saved to /tmp/git-branchd.log"
+    echo
+    echo -e "\tIgnore branches with:"
+    echo -e "\tgit branchd -i ignore-me this-one-too"
     exit 0
+    ;;
+  i|-i|ignore|-ignore|--ignore)
+    shift
+    arr=("$@")
+    for i in "${!arr[@]}"; do
+      ignore+="\|${arr[i]}"
+    done
     ;;
   none)
     ;;
@@ -25,12 +38,16 @@ case "$arg" in
     ;;
 esac
 
+if [[ "$ignore" != "" ]]; then
+  echo "The following will be ignored: ${arr[@]}"
+fi
+
 read -p "${green}Force delete branches? <y/n>: ${reset}" resp
 
 case "$resp" in
   y|yes)
     git branch | \
-      grep -v "*\|master\|main" | \
+      grep -v "*\|master\|main$ignore" | \
       xargs git branch -D \
       | tee /dev/tty > /tmp/git-branchd.log
     ;;
